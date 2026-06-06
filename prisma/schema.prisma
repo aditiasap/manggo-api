@@ -8,4 +8,36 @@ datasource db {
   url      = env("DBURL")
 }
 
+model ImageGenerationSession {
+  id        String   @id @default(cuid())
+  sessionId String   @unique
+
+  contents  ImageGenerationContent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sessionId])
+}
+
+model ImageGenerationContent {
+  id              String @id @default(cuid())
+  promptId        String
+  prompt          String
+  style           String?
+  enhancedPrompt  String?
+
+  imageUrl      String? // Cloudinary URL
+  status        String  // pending / processing / success / failed
+  stage         String? // request_received / generating_image / uploading_image / done
+  error         String? // (flexible JSON string)
+
+  provider      String? // provider AI
+  meta          String? // meta data AI (flexible JSON string)
+
+  sessionId     String
+  session       ImageGenerationSession @relation(fields: [sessionId], references: [id])
+
+  createdAt     DateTime @default(now())
+}
 

@@ -29,6 +29,9 @@ Install Prisma :
 	- npm install prisma@6 --save-dev
 	- npm install --save @prisma/client@6
 
+Setup schema.prisma file including DB-name within .env file, then:
+	- npx prisma migrate dev --name init
+
 
 ============================================
 [Concepts]

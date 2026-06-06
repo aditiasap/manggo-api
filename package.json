@@ -4,7 +4,9 @@
   "description": "APIs for MangGo App",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node --env-file=.env ./app.js",
+    "prod": "pm2 start .pm2.config.js",
+    "stop": "pm2 delete .pm2.config.js"
   },
   "author": "Adit",
   "license": "ISC",

@@ -72,7 +72,18 @@ router.get("/health", async (req, res) => {
 // Business APIs
 // =============================================
 
+// Get gallery data based on userSession (sessionId)
+// /gallery
 
+
+
+// Generate image
+// /generate
+
+
+
+// Check status with polling from FE
+// /statuscheck
 
 
 
