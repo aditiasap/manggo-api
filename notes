@@ -35,20 +35,134 @@ Install Prisma :
 
 Express - Prisma - DB (SQLite)
 
+ExpressJs is used because the character of this app as the channel to core system, in this case AI system, where ExpressJs (NodeJs) do async style naturally.
+
+Choosing SQL-based DB rather than document because of natural character of this app when growing bigger. The data most likely will be used for statistics/analytics or even billing, which is more natural using relational DB rather than unstructured ones.
+
+Using Prisma as an abstraction layer of SQL-based DB, will ease migration to more enterprise grade DB, like PostgreSQL, at later time.
+
+
+Express - Pollination AI API
+Express - Cloudinary (Cloud Image service)
+
+
+
 Data structure:
-	ImageGeneration {
-		sessionId
-		contents: [
+
+model ImageGenerationSession {
+	id        String   @id @default(cuid())
+	sessionId String   @unique
+
+	contents  ImageGenerationContent[]
+
+	createdAt DateTime @default(now())
+	updatedAt DateTime @updatedAt
+
+	@@index([sessionId])
+}
+
+model ImageGenerationContent {
+	id        		String @id @default(cuid())
+	promptId  		String
+	prompt    		String
+	style     		String?
+	enhancedPrompt 	String?
+
+	imageUrl  		String?	// Cloudinary URL
+	status    		String	// pending / processing / success / failed
+	stage 			String? // request_received / generating_image / uploading_image / done
+	error 			String? // (flexible JSON string)
+
+	provider  		String?	// provider AI
+	meta      		String?	// meta data AI (flexible JSON string)
+
+	sessionId 		String
+	session   		ImageGenerationSession @relation(fields: [sessionId], references: [id])
+
+	createdAt 		DateTime @default(now())
+}
+
+
+Sample result data:
+	{
+		"sessionId": "abc123",
+		"contents": [
 			{
-				promptId,
-				prompt,
-				imageUrl,
-				status,
-				createdAt,
+				"promptId": "p1",
+				"prompt": "anime girl",
+				"imageUrl": "...",
+				"status": "success"
 			}
 		]
 	}
 
+Sample meta data AI:
+	meta: {
+		request: {
+			seed: 12345,
+			steps: 30,
+			cfgScale: 7
+		},
+		response: {
+			"aiImageUrl": "...",
+			"usage": {
+				"tokens": 1200
+			},
+			model: "sdxl",
+			latency: 2.3,
+			cost: 0.02,
+			"warnings": []
+		}
+	}
+
+Sample error data:
+	error: {
+		ai: '',
+		storage: 'failed to upload image'
+	}
 
 
+In order to give better UX for meaningful loading states at FE (10-30s is normal), here are the status to set:
+
+Status:
+	pending - request_received ("Pending request"):
+		user submit, backend set "pending" state.
+
+	processing:
+		generating_image ("Generating AI image"): request pass to AI to generate image
+		uploading_image ("Uploading image"): after image returned from AI, upload image to Cloudinary
+
+	success - done: if AI and cloudinary upload success, set success.
+
+	failed - done: if one of AI or cloudinary upload failed, set failed and set error for reason.
+
+
+
+Samples to do polling at FE:
+
+setInterval(async () => {
+	const res = await fetch(`/api/image/${id}`)
+	const data = await res.json()
+
+	if (data.status === "success") {
+		stopPolling()
+	}
+}, 2000)
+
+async function checkStatus(id) {
+	const res = await fetch(`/api/image/${id}`)
+	const data = await res.json()
+
+	if (data.status === "pending") {
+		setTimeout(() => checkStatus(id), 2000)
+	}
+
+	if (data.status === "success") {
+		console.log("done", data.imageUrl)
+	}
+
+	if (data.status === "failed") {
+		console.log("error", data.error)
+	}
+}
 

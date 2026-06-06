@@ -1,0 +1,11 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Change DB to a more production-grade DB here, like Postgre or MySQL
+datasource db {
+  provider = "sqlite"
+  url      = env("DBURL")
+}
+
+
