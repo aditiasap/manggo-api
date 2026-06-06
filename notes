@@ -1,0 +1,54 @@
+Steps :
+> mkdir manggo-api
+> cd manggo-api/
+
+> npm init
+	- description: APIs for MangGo App
+	- entry point: (index.js) app.js
+	- author: Adit
+	- the rests yes
+
+> git init
+> copy .gitignore from other api project
+
+
+> npm install --save express
+
+Cors handler (express middleware) :
+- npm install --save cors
+
+For Logger, use Pino (instead of morgan) :
+- npm install --save pino pino-http
+- npm install --save-dev pino-pretty
+
+For input validations :
+- npm install --save express-validator
+	detail docs of validation: https://github.com/validatorjs/validator.js/blob/master/README.md
+
+Install Prisma :
+	- npm install prisma@6 --save-dev
+	- npm install --save @prisma/client@6
+
+
+============================================
+[Concepts]
+
+Express - Prisma - DB (SQLite)
+
+Data structure:
+	ImageGeneration {
+		sessionId
+		contents: [
+			{
+				promptId,
+				prompt,
+				imageUrl,
+				status,
+				createdAt,
+			}
+		]
+	}
+
+
+
+
