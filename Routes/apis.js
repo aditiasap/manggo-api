@@ -3,34 +3,7 @@ const express = require("express");
 const router = express.Router();
 const prisma = require('./lib/prismaClient');
 
-// For input validator
-const { body, validationResult } = require('express-validator');
-
-// =============================================
-// Function Calls
-// =============================================
-
-// Function call validate inputs
-// sequential processing, stops running validations chain if the previous one fails.
-const validateInputs = validations => {
-	return async (req, res, next) => {
-		for (let validation of validations) {
-			const result = await validation.run(req);
-			if (result.errors.length) break;
-		}
-
-		const errors = validationResult(req);
-		if (errors.isEmpty()) {
-			return next();
-		}
-		//console.log('error: ', errors);
-		req.log.error(
-			{ err: errors.array(), username: req.username },
-			"Input validation failed"
-		);
-		res.status(400).json({ message: "invalid inputs" });
-	};
-};
+const restrictedapis = require("./restrictedapis");
 
 // =============================================
 // Test APIs
@@ -39,7 +12,7 @@ const validateInputs = validations => {
 // ping app
 router.get("/pingapp", (req, res) => {
 	//req.log.info('apps is live..');
-	res.send("apps is live..");
+	return res.send("apps is live..");
 });
 
 // Check app + db healthiness
@@ -72,19 +45,51 @@ router.get("/health", async (req, res) => {
 // Business APIs
 // =============================================
 
-// Get gallery data based on userSession (sessionId)
-// /gallery
+// Get sessionId (for new access)
+router.get("/get-session", async (req, res) => {
+	try {
+		const newSession = await prisma.sessions.create({ data: {} });
+		return res.status(200).json({
+			sessId: newSession.id
+		});
+	}
+	catch(err) {
+		req.log.error(
+			{ err },
+			"Create session error: " + err.message
+		);
+		return res.status(500).json({ message: "Create session error" });
+	}
+});
 
+// Session Checking.
+router.use(async (req, res, next) => {
+	try {
+		// get header Auth with format Authorization: Bearer 64ea-2472-0390-b72a-799d-8275
+		const authHeader = req.get("Authorization");
+		if (!authHeader || !authHeader.startsWith("Bearer ")) {
+			return res.status(401).json({ message: "no session" });
+		}
+		const sessionId = authHeader.substring(7);
+		const sessionData = await prisma.sessions.findUnique({
+			where: { id: sessionId }
+		});
 
+		if (!sessionData) {
+			return res.status(401).json({ message: "invalid session" });
+		}
 
-// Generate image
-// /generate
+		req.sessionId = sessionId;
+		next();
+	}
+	catch(err) {
+		//console.log(err);
+		req.log.error({ err }, err.message);
+		return res.status(500).json({ message: "Check session error" });
+	}
+});
 
-
-
-// Check status with polling from FE
-// /statuscheck
-
-
+// Pass to restricted apis
+router.use(restrictedapis);
 
 module.exports = router;

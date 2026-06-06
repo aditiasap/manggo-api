@@ -22,8 +22,7 @@ app.use(cors());
 // Get xforwarded-for from proxy
 app.set('trust proxy', true);
 
-// inject Pino logger ke setiap request
-//app.use(pinoHttp({ logger }));
+// inject Pino logger
 app.use(pinoHttp({
 	logger,
 	serializers: {

@@ -169,3 +169,22 @@ async function checkStatus(id) {
 	}
 }
 
+
+===========================================
+[To Pollinations AI API]
+
+sample error:
+
+{
+  "success": false,
+  "error": {
+    "message": "Model 'zimage' is not allowed for this API key",
+    "code": "FORBIDDEN",
+    "timestamp": "2026-06-06T13:16:27.778Z"
+  },
+  "status": 403
+}
+
+
+
+
