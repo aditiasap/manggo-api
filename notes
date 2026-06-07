@@ -33,6 +33,11 @@ Setup schema.prisma file including DB-name within .env file, then:
 	- npx prisma migrate dev --name init
 
 
+Cloudinary Setup (Cloud-based image service):
+	- npm install --save cloudinary
+
+
+
 ============================================
 [Concepts]
 
@@ -172,6 +177,15 @@ async function checkStatus(id) {
 
 ===========================================
 [To Pollinations AI API]
+
+API GET IMAGE:
+	https://gen.pollinations.ai/image/${encodedPrompt}?model=flux
+	headers: {
+		Authorization: 'Bearer YOUR_SECRET_TOKEN'
+	}
+
+return image file.
+
 
 sample error:
 

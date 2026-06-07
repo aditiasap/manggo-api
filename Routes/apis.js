@@ -61,6 +61,26 @@ router.get("/get-session", async (req, res) => {
 		return res.status(500).json({ message: "Create session error" });
 	}
 });
+// Check validity of sessionId
+router.get("/check-session/:sessionId", async (req, res) => {
+	try {
+		const sessionData = await prisma.sessions.findUnique({
+			where: { id: req.params.sessionId }
+		});
+		
+		if (!sessionData) {
+			return res.status(401).json({ message: "invalid session" });
+		}
+		return res.status(200).json({ message: "session is valid" });
+	}
+	catch(err) {
+		req.log.error(
+			{ err },
+			"Check session error: " + err.message
+		);
+		return res.status(500).json({ message: "Check session error" });
+	}
+});
 
 // Session Checking.
 router.use(async (req, res, next) => {

@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const pinoHttp = require('pino-http');
 const { logger } = require('./Routes/lib/logger');
+const cloudinary = require('cloudinary').v2;
 
 const port = process.env.PORT || 1;
 // Setting specific local host to allow only access from localhost
@@ -39,6 +40,14 @@ app.use(pinoHttp({
 		},
 	},
 }));
+
+// cloudinary
+cloudinary.config({
+	secure: true,
+	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+	api_key: process.env.CLOUDINARY_API_KEY,
+	api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // change temporary to /api
 app.use("/api", apis);
