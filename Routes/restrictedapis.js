@@ -34,7 +34,7 @@ const validateInputs = validations => {
 	};
 };
 
-const processGenerateImage = async (jobId, sess) => {
+const processGenerateImage = async (jobId, sess, req) => {
 	try {
 		// take the job
 		const job = await prisma.contents.findUnique({
@@ -145,27 +145,29 @@ const generateImage = async (prompt) => {
 		);
 
 		if (!response.ok) {
-			throw new Error("AI resp - failed");
+			// const errorText = await response.text();
+			// throw new Error(`AI response failed ${response.status}: ${errorText}`);
+			throw new Error(`AI response failed`);
 		}
 
 		// handle invalid image response
 		const contentType = response.headers.get('content-type');
 		if (!contentType?.startsWith('image/')) {
-			throw new Error("AI resp - Invalid image response");
+			throw new Error("AI response error: Invalid image response");
 		}
 
 		// handle empty image (size 0)
 		const arrayBuffer = await response.arrayBuffer();
 		const buffer = Buffer.from(arrayBuffer);
 		if (!buffer.length) {
-			throw new Error("AI resp - Empty image");
+			throw new Error("AI response error: Empty image");
 		}
 
 		return buffer;
 	}
 	catch(err) {
 		if (err.name === "AbortError") {
-			throw new Error("AI proc - Request timeout");
+			throw new Error("AI process error: Request timeout");
 		}
 		throw err;
 	}
@@ -218,6 +220,8 @@ router.post("/generate-image",
 				data.style}, ${qualityTags}
 		`.trim();
 
+		// comment out for negative test case API timeout
+		// start here --------------------------------------
 		const job = await prisma.contents.create({
 			data: {
 				prompt,
@@ -229,13 +233,14 @@ router.post("/generate-image",
 		});
 
 		// async background
-		processGenerateImage(job.id, req.sessionId);
+		processGenerateImage(job.id, req.sessionId, req);
 
 		// Request Accepted
 		return res.status(202).json({
 			jobId: job.id,
 			status: job.status,
 		});
+		// until here --------------------------------------
 	}
 	catch(err) {
 		req.log.error(

@@ -1,4 +1,37 @@
-# Manggo API
+# MangGo API
 
 ExpressJs based API for MangGo App.
 
+
+## Installation
+
+Make sure git and node version > 20 is installed and running
+
+```bash
+git clone https://github.com/aditiasap/manggo-api.git
+cd manggo-api
+npm install
+```
+
+
+## Setup Environment
+
+create .env file in the root project, and fill in as below:
+
+```bash
+PORT=37119
+DBURL="file:./manggo.db"
+POLLINATIONS_API_KEY=
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+```
+
+Register and login into Pollinations AI and Cloudinary, then get all required secret info above within their dashboard. Create the key if none.
+
+
+## Run in dev mode
+
+```bash
+npm run dev
+```
