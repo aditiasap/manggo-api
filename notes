@@ -40,8 +40,9 @@ Cloudinary Setup (Cloud-based image service):
 ============================================
 [Deployment]
 
-Deploy schema based on historical migrations
-- npx prisma migrate deploy
+Deploy schema
+- npx prisma generate 			// create prismaClient
+- npx prisma migrate deploy 	// deploy schema based on historical migration
 
 
 To monitor all running status:

@@ -30,6 +30,13 @@ CLOUDINARY_API_SECRET=
 Register and login into Pollinations AI and Cloudinary, then get all required secret info above within their dashboard. Create the key if none.
 
 
+## Deploy DB SQLite Schema
+
+```bash
+npx prisma generate
+npx prisma migrate deploy
+```
+
 ## Run in dev mode
 
 ```bash
