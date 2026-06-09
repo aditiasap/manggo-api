@@ -1,6 +1,6 @@
 # MangGo API
 
-ExpressJs based API for MangGo App.
+API GW for MangGo App (using ExpressJs).
 
 
 ## Installation
