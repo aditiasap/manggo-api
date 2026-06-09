@@ -50,7 +50,7 @@ cloudinary.config({
 });
 
 // change temporary to /api
-app.use("/api", apis);
+app.use("/manggo/api", apis);
 
 app.listen(node.port, node.host, () => {
 	console.log(`Server running at http://${node.host}:${node.port}/`);
