@@ -42,3 +42,5 @@ npx prisma migrate deploy
 ```bash
 npm run dev
 ```
+
+The local API GW should be accessible at http://localhost:37119/manggo/api
